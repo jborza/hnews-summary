@@ -32,6 +32,9 @@ dependencies {
 
 	// Hibernate dialect for SQLite
 	implementation 'org.hibernate:hibernate-core:6.2.0.Final'
+
+	// thymeleaf - template engine
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
 
 tasks.named('test') {

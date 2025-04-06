@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Top Hacker News Articles</title>
+</head>
+<body>
+<h1>Top Hacker News Articles</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>URL</th>
+        <th>Comments</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="article : ${articles}">
+        <td th:text="${article.title}"></td>
+        <td><a th:href="${article.url}" th:text="${article.url}"></a></td>
+        <td th:text="${article.comments}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
