@@ -21,4 +21,11 @@ public class HackerNewsController {
         model.addAttribute("articles", articles);
         return "top-articles"; // Ensure this matches the template name
     }
+
+    @GetMapping("/top-articles-summary")
+    public String getTopArticlesSummary(Model model) throws IOException {
+        List<HackerNewsArticleSummary> articles = service.fetchAndSummarizeArticles();
+        model.addAttribute("articles", articles);
+        return "top-articles-summary";
+    }
 }

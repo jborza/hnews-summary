@@ -12,6 +12,7 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
+	sourceCompatibility = '21'
 }
 
 repositories {
@@ -25,8 +26,6 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	compileOnly 'org.projectlombok:lombok:1.18.28'
-	annotationProcessor 'org.projectlombok:lombok:1.18.28'
 	// SQLite dependency
 	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
 
@@ -35,6 +34,9 @@ dependencies {
 
 	// thymeleaf - template engine
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	// text library - for json escape
+	implementation 'org.apache.commons:commons-text:1.9'
 }
 
 tasks.named('test') {
