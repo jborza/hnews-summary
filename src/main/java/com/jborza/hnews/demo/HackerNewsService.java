@@ -26,13 +26,14 @@ public class HackerNewsService {
     private String apiKey;
 
     private final OpenAIService openAIService;
-
+    private final DeepSeekService deepSeekService;
 
     private final RestTemplate restTemplate;
 
-    public HackerNewsService(RestTemplate restTemplate, OpenAIService service) {
+    public HackerNewsService(RestTemplate restTemplate, OpenAIService service, DeepSeekService deepSeekService) {
         this.restTemplate = restTemplate;
         this.openAIService = service;
+        this.deepSeekService = deepSeekService;
     }
 
     @Autowired
@@ -80,19 +81,6 @@ public class HackerNewsService {
         return doc.text();
     }
 
-//    public String generateSummary(String content) {
-//        String url = "https://api.openai.com/v1/responses";
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Authorization", "Bearer " + apiKey);
-//        headers.set("Content-Type", "application/json");
-//
-//        String requestBody = String.format("{\"input\": \"Summarize the following content:\\n\\n%s\\n\\nSummary:\", \"model\": \"gpt-4o\"}", content);
-//        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-//
-//        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-//        return response.getBody();
-//    }
-
     public List<HackerNewsArticleSummary> fetchAndSummarizeArticles() throws IOException {
         List<HackerNewsArticle> articles = fetchTopArticles();
         // for now, take just the first one
@@ -106,6 +94,27 @@ public class HackerNewsService {
             try {
                 String content = fetchArticleContent(article.getUrl());
                 String summary = openAIService.generateSummary(content);
+                return new HackerNewsArticleSummary(article, summary);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return new HackerNewsArticleSummary(article, "Summary not available");
+            }
+        }).collect(Collectors.toList());
+    }
+
+    public List<HackerNewsArticleSummary> fetchAndSummarizeArticlesDeepSeek() throws IOException {
+        List<HackerNewsArticle> articles = fetchTopArticles();
+        // for now, take just the first one
+        var first = new ArrayList<>(articles);
+        int count = first.size();
+        for(int i = 1; i < count; i++){
+            first.removeLast();
+        }
+
+        return first.stream().map(article -> {
+            try {
+                String content = fetchArticleContent(article.getUrl());
+                String summary = deepSeekService.generateSummary(content);
                 return new HackerNewsArticleSummary(article, summary);
             } catch (IOException e) {
                 e.printStackTrace();

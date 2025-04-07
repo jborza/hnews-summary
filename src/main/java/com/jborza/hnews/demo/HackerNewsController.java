@@ -28,4 +28,13 @@ public class HackerNewsController {
         model.addAttribute("articles", articles);
         return "top-articles-summary";
     }
+
+    @GetMapping("/top-articles-deepseek")
+    public String getTopArticlesSummaryOllama(Model model) throws IOException {
+        List<HackerNewsArticleSummary> articles = service.fetchAndSummarizeArticlesDeepSeek();
+        model.addAttribute("articles", articles);
+        return "top-articles-summary";
+    }
+
+
 }
