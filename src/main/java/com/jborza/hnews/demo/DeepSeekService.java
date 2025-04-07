@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.text.StringEscapeUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,7 +24,12 @@ public class DeepSeekService {
         this.objectMapper = objectMapper;
     }
 
-    public String generateSummary(String content) throws JsonProcessingException {
+    private String getResponseBody(String url, HttpEntity<String> entity ){
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        return response.getBody();
+    }
+
+    public String generateSummary(String content) throws JsonProcessingException  {
         String url = "http://localhost:11434/api/generate";
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
@@ -40,17 +44,24 @@ public class DeepSeekService {
         String requestBody = String.format("{\"prompt\": \"Summarize the following content:\\n\\n%s\\n\\nSummary:\", \"model\": \"deepseek-r1:1.5b\"}", escapedContent);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-
-        // TODO parse the text from response
-        // it's in
-        // {"model":"deepseek-r1:1.5b","created_at":"2025-04-06T19:46:03.0800156Z","response":"Okay","done":false}
-        JsonNode root = objectMapper.readTree(response.getBody());
-        return response.getBody();
-//        // Parse the response JSON and extract the summary
-//        JsonNode root = objectMapper.readTree(response.getBody());
-//        JsonNode textNode = root.path("output").get(0).path("content").get(0).path("text");
-//        return textNode.asText();
+        // it's in {"model":"deepseek-r1:1.5b","created_at":"2025-04-06T19:46:03.0800156Z","response":"Okay","done":false}
+        String body = getResponseBody(url, entity);
+        // the body is a list of json objects separated by newline, so we need to iterate through them
+        StringBuilder stringBuilder = new StringBuilder();
+        body.lines().forEach(line -> {
+            System.out.println(line);
+            try {
+                JsonNode root = objectMapper.readTree(line);
+                // get "response"
+                JsonNode responseNode = root.path("response");
+                String responsePart = responseNode.asText();
+                stringBuilder.append(responsePart);
+            }
+            catch (JsonProcessingException ignored){}
+        });
+        String response = stringBuilder.toString();
+        // remove <think> ... </think>
+        return response.replaceAll("(?s)<think>.*?</think>", "");
     }
 
 

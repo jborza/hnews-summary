@@ -81,14 +81,23 @@ public class HackerNewsService {
         return doc.text();
     }
 
-    public List<HackerNewsArticleSummary> fetchAndSummarizeArticles() throws IOException {
+    private List<HackerNewsArticle> fetchTopArticlesForSummary() throws IOException {
         List<HackerNewsArticle> articles = fetchTopArticles();
         // for now, take just the first one
-//        var first = new ArrayList<>(articles);
-//        int count = first.size();
-//        for(int i = 1; i < count; i++){
-//            first.removeLast();
-//        }
+        boolean limitToJustOneArticle = false;
+        if(limitToJustOneArticle) {
+            var first = new ArrayList<>(articles);
+            int count = first.size();
+            for (int i = 1; i < count; i++) {
+                first.removeLast();
+            }
+            articles = first;
+        }
+        return articles;
+    }
+
+    public List<HackerNewsArticleSummary> fetchAndSummarizeArticles() throws IOException {
+        var articles = fetchTopArticlesForSummary();
 
         return articles.stream().map(article -> {
             try {
@@ -103,15 +112,9 @@ public class HackerNewsService {
     }
 
     public List<HackerNewsArticleSummary> fetchAndSummarizeArticlesDeepSeek() throws IOException {
-        List<HackerNewsArticle> articles = fetchTopArticles();
-        // for now, take just the first one
-        var first = new ArrayList<>(articles);
-        int count = first.size();
-        for(int i = 1; i < count; i++){
-            first.removeLast();
-        }
+        var articles = fetchTopArticlesForSummary();
 
-        return first.stream().map(article -> {
+        return articles.stream().map(article -> {
             try {
                 String content = fetchArticleContent(article.getUrl());
                 String summary = deepSeekService.generateSummary(content);
