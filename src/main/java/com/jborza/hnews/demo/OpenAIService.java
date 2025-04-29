@@ -3,6 +3,7 @@ package com.jborza.hnews.demo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,7 +18,7 @@ import java.io.IOException;
 @Service
 public class OpenAIService {
 
-    @Value("${openai.api.key}")
+
     private String apiKey;
 
     private final RestTemplate restTemplate;
@@ -26,6 +27,8 @@ public class OpenAIService {
     public OpenAIService(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        Dotenv dotenv = Dotenv.load();
+        this.apiKey = dotenv.get("OPENAI_API_KEY");
     }
 
     public String generateSummary(String content) throws JsonProcessingException {

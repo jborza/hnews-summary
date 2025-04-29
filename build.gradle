@@ -40,6 +40,9 @@ dependencies {
 
 	// text library - for json escape
 	implementation 'org.apache.commons:commons-text:1.9'
+
+	// dotenv for secrets
+	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 }
 
 tasks.named('test') {
