@@ -1,11 +1,6 @@
 package com.jborza.hnews.demo;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,23 +12,16 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class HackerNewsService {
 
-    @Value("${openai.api.key}")
-    private String apiKey;
-
     private final OpenAIService openAIService;
-    private final DeepSeekService deepSeekService;
+    private final OllamaService ollamaService;
 
-    private final RestTemplate restTemplate;
-
-    public HackerNewsService(RestTemplate restTemplate, OpenAIService service, DeepSeekService deepSeekService) {
-        this.restTemplate = restTemplate;
+    public HackerNewsService(OpenAIService service, OllamaService ollamaService) {
         this.openAIService = service;
-        this.deepSeekService = deepSeekService;
+        this.ollamaService = ollamaService;
     }
 
     @Autowired
@@ -84,7 +72,7 @@ public class HackerNewsService {
     private List<HackerNewsArticle> fetchTopArticlesForSummary() throws IOException {
         List<HackerNewsArticle> articles = fetchTopArticles();
         // for now, take just the first one
-        boolean limitToJustOneArticle = false;
+        boolean limitToJustOneArticle = true;
         if(limitToJustOneArticle) {
             var first = new ArrayList<>(articles);
             int count = first.size();
@@ -111,13 +99,13 @@ public class HackerNewsService {
         }).collect(Collectors.toList());
     }
 
-    public List<HackerNewsArticleSummary> fetchAndSummarizeArticlesDeepSeek() throws IOException {
+    public List<HackerNewsArticleSummary> fetchAndSummarizeArticlesOllama() throws IOException {
         var articles = fetchTopArticlesForSummary();
 
         return articles.stream().map(article -> {
             try {
                 String content = fetchArticleContent(article.getUrl());
-                String summary = deepSeekService.generateSummary(content);
+                String summary = ollamaService.generateSummary(content);
                 return new HackerNewsArticleSummary(article, summary);
             } catch (IOException e) {
                 e.printStackTrace();

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,13 +14,18 @@ import org.springframework.web.client.RestTemplate;
 
 
 @Service
-public class DeepSeekService {
+public class OllamaService {
 
+    @Value("${ollama.url}")
+    private String url;
+
+    @Value("${ollama.model}")
+    private String model;
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    public DeepSeekService(RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public OllamaService(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
     }
@@ -30,18 +36,22 @@ public class DeepSeekService {
     }
 
     public String generateSummary(String content) throws JsonProcessingException  {
-        String url = "http://localhost:11434/api/generate";
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
         // looks like our content  contains quotes or something
         String escapedContent = StringEscapeUtils.escapeJson(content);
-        // limit for GPT 4o is 30000, so shrink the escaped content if it's too big
         // TODO fix for DeepSeek
         int sizeLimit = 30000;
         if(escapedContent.length() > sizeLimit)
             escapedContent = escapedContent.substring(0, sizeLimit);
-        String requestBody = String.format("{\"prompt\": \"Summarize the following content:\\n\\n%s\\n\\nSummary:\", \"model\": \"deepseek-r1:1.5b\"}", escapedContent);
+        String requestFormat = """
+                {"prompt": "Summarize the following content: \\n %s",
+                "model": "%s"
+                }
+                """;
+        String requestBody = requestFormat.formatted(escapedContent, model);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
         // it's in {"model":"deepseek-r1:1.5b","created_at":"2025-04-06T19:46:03.0800156Z","response":"Okay","done":false}
