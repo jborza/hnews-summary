@@ -72,7 +72,7 @@ public class HackerNewsService {
     private List<HackerNewsArticle> fetchTopArticlesForSummary() throws IOException {
         List<HackerNewsArticle> articles = fetchTopArticles();
         // for now, take just the first one
-        boolean limitToJustOneArticle = true;
+        boolean limitToJustOneArticle = false;
         if(limitToJustOneArticle) {
             var first = new ArrayList<>(articles);
             int count = first.size();
