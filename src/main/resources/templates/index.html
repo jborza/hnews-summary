@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}">Welcome</title>
+</head>
+<body>
+<h1 th:text="${title}">Welcome to Hacker News Summarizer</h1>
+<p>This is the homepage of the application. Below are some useful links:</p>
+<ul>
+    <li>
+        <a href="/top-articles">Top 10 Articles</a> - List of the top 10 articles.
+    </li>
+    <li>
+        <a href="/top-articles-openai">Top Articles (Summarized by OpenAI)</a> - Top articles with content summarized by OpenAI.
+    </li>
+    <li>
+        <a href="/top-articles-ollama">Top Articles (Summarized by Ollama)</a> - Top articles with content summarized by Ollama.
+    </li>
+</ul>
+</body>
+</html>
