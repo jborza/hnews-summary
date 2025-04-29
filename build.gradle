@@ -43,6 +43,9 @@ dependencies {
 
 	// dotenv for secrets
 	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+
+	// markdown
+	implementation 'com.vladsch.flexmark:flexmark-all:0.64.0'
 }
 
 tasks.named('test') {

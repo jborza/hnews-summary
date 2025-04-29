@@ -10,7 +10,7 @@
         <h2 th:text="${articleSummary.article.title}">Title</h2>
         <p><a th:href="${articleSummary.article.url}" th:text="${articleSummary.article.url}">URL</a></p>
         <p th:text="'Comments: ' + ${articleSummary.article.comments}">Comments</p>
-        <p th:text="'Summary: ' + ${articleSummary.summary}">Summary</p>
+        <div th:utext="${articleSummary.summary}"></div>
     </li>
 </ul>
 </body>

@@ -25,9 +25,12 @@ public class OllamaService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
+    private final MarkdownConverter markdownConverter;
+
     public OllamaService(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        this.markdownConverter = new MarkdownConverter();
     }
 
     private String getResponseBody(String url, HttpEntity<String> entity ){
@@ -70,9 +73,10 @@ public class OllamaService {
             catch (JsonProcessingException ignored){}
         });
         String response = stringBuilder.toString();
-        // remove <think> ... </think>
-        return response.replaceAll("(?s)<think>.*?</think>", "");
+        // remove <think> ... </think> from Qwen models
+        String markdownResponse = response.replaceAll("(?s)<think>.*?</think>", "");
+
+        // Convert Markdown response to HTML
+        return markdownConverter.convertToHtml(markdownResponse);
     }
-
-
 }
